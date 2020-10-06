@@ -1,0 +1,51 @@
+replicaCount: 1
+project_name: minter-node-runner
+
+image:
+  repository:
+    host: ''
+    port: ''
+    project: ''
+    app_name: ''
+    env: ''
+  tag: ''
+
+  pullPolicy: Always
+  secret_prefix: docker-registry
+
+
+
+monitoring:
+  enabled: false
+#  appProjectId: "p-wgmtr"
+#  prometeusNamespace: "cattle-prometheus-p-wgmtr"
+  app:
+    image: dmi7ry/tendermint-prometheus-exporter:latest
+    command: serve --target http://localhost:3000/api --status --net-info
+    pullPolicy: Always
+
+app:
+  isValidator: false
+  secretPrefix: node-runner
+
+ingress:
+  enabled: true
+  secretName: ingress-cert
+
+release:
+  branch: master
+  hash: sha34512
+
+## Persist data to a persistent volume
+persistence:
+  enabled: true
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: "openebs-hostpath"
+  size: 200Gi
+  annotations: {}

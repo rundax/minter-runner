@@ -1,0 +1,101 @@
+{{ if (eq .Values.app.isValidator false) }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    "app.kubernetes.io/name": '{{ .Chart.Name }}'
+spec:
+  serviceName: {{ .Chart.Name }}
+  selector:
+    matchLabels:
+      "app.kubernetes.io/name": '{{ .Chart.Name }}'
+      "app.kubernetes.io/release": "{{ .Release.Name }}"
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        "app.kubernetes.io/name": '{{ .Chart.Name }}'
+        "app.kubernetes.io/release": "{{ .Release.Name }}"
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: {{ .Chart.Name }}-nodeport
+      imagePullSecrets:
+        - name: {{ .Values.image.secret_prefix }}-{{ .Values.project_name }}
+      containers:
+        - name: {{ .Chart.Name }}-process
+          image: "{{ .Values.image.repository.host }}:{{ .Values.image.repository.port }}/{{ .Values.image.repository.project }}/{{ .Values.image.repository.app_name }}/{{ .Values.image.repository.env }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: node-api
+              containerPort: 3000
+            - name: node-prom-stats
+              containerPort: 26660
+            - name: node-p2p
+              containerPort: 26656
+            - name: node-rpc
+              containerPort: 26657
+          {{ if (eq .Values.persistence.enabled true) }}
+          volumeMounts:
+            - mountPath: '/app/data/'
+              name: {{ .Values.app.secretPrefix }}-volume
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.app.secretPrefix }}-generic
+          readinessProbe:
+            httpGet:
+              path: /probe/ready
+              port: node-api
+          livenessProbe:
+           httpGet:
+             path: /probe/liveness
+             port: node-api
+          startupProbe:
+            httpGet:
+              path: /probe/ready
+              port: node-api
+            failureThreshold: 30
+            periodSeconds: 10
+        {{ if (eq .Values.monitoring.enabled true) }}
+        - name: {{ .Chart.Name }}-api-metrics
+          image: {{ .Values.monitoring.app.image }}
+          command:
+            - /usr/bin/node
+            - index
+            - {{ .Values.monitoring.app.command }}
+          ports:
+            - name: api-metrics
+              containerPort: 9697
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: api-metrics
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: api-metrics
+        {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - '{{ .Chart.Name }}'
+              topologyKey: "kubernetes.io/hostname"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.app.secretPrefix }}-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "{{ .Values.persistence.storageClass }}"
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+{{- end }}

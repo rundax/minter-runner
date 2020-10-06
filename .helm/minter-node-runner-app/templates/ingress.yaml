@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}-ingress
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  rules:
+  - host: {{ .Values.ingress.hostName }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Chart.Name }}-web
+          servicePort: node-api
+        path: {{ .Values.ingress.path }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.hostName }}
+    secretName: {{ .Values.ingress.secretName }}

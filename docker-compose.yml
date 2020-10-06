@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  app:
+    container_name: ${APP_PROJECT_NAME}_app
+    image: ${DOCKER_SERVER_HOST}:${DOCKER_SERVER_PORT}/${DOCKER_PROJECT_PATH}/node${DOCKER_NODE_VERSION}-minter:${DOCKER_IMAGE_VERSION}
+    stop_signal: INT
+    user: 1000:1000
+    tty: true
+    volumes:
+      - ./:/app:rw
+      - ~/.cache/yarn:/home/node/.cache/yarn:rw
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+      - 8841:8841

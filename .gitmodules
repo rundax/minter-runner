@@ -1,0 +1,3 @@
+[submodule ".gitlab-ci-functions"]
+	path = .gitlab-ci-functions
+	url = https://github.com/SomeBlackMagic/gitlab-ci-functions

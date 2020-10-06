@@ -1,0 +1,9 @@
+apiVersion: v1
+description: minter node runner - run minter node in backround porcess. Monitoring is synced end etc
+name: minter-node-runner
+version: 0.1.0
+appVersion: __RELEASE_VERSION__-__RELEASE_HASH__
+maintainers:
+  - name: Andru Cherny
+    email: andrew@rundax.com
+    url: https://github.com/wirwolf
