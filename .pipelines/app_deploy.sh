@@ -4,6 +4,13 @@ function app_deploy() {
     HELM_APP_NAME=$2
     rancher_login && helm_cluster_login
 
+    sed \
+        -e "s#__RELEASE_BRANCH__#${GIT_BRANCH}#g" \
+        -e "s#__RELEASE_HASH__#${HELM_ENV}#g" \
+        \
+        .helm/${CI_PROJECT_NAME}-${HELM_APP_NAME}/Chart.template.yaml > \
+        .helm/${CI_PROJECT_NAME}-${HELM_APP_NAME}/Chart.yaml
+
     ${HELM} --namespace ${KUBE_NAMESPACE} list
 #    ${HELM} --namespace ${KUBE_NAMESPACE} uninstall ${CI_PROJECT_NAME}-${HELM_APP_NAME}
 
