@@ -9,7 +9,7 @@ import * as Router from 'koa-router';
 import {Context} from 'koa';
 export class NodeApi extends BaseModule<NodeApi> {
 
-    private NODE_BASE_URL:string = 'http://localhost:8841/';
+    private NODE_BASE_URL:string = 'http://localhost:8843/';
 
     private config: any = null;
     private bus: EventBusInterface<SimpleEventBus>;
@@ -71,14 +71,18 @@ export class NodeApi extends BaseModule<NodeApi> {
             this.axiosClient.request<boolean | object>({
                 method: method as Method,
                 url,
-                data: body
+                data: body,
+                validateStatus: function () {
+                    return true;
+                }
             })
                 .then((response: AxiosResponse) => {
                     resolve(response.data);
-                }).catch((error) => {
-                    Core.info('Error to get response: ', [url, error.name, error.message], 'NodeApi');
+                })
+                .catch((error) => {
+                    Core.info('Error to get response: ', [url, error], 'NodeApi');
                     reject(error);
-            });
+                });
         });
     }
 }
