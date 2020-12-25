@@ -167,9 +167,7 @@ export class NodeRunner extends BaseModule<NodeRunner> {
             }, 10000);
             this.daemon.kill(NodeRunner.STOP_SIGNAL);
             this.daemon.on('exit', (code: number) => {
-                if (code !== 0) {
-                    Core.info('Node exit with code:', code,  'NodeRunner');
-                }
+                Core.info('Node exit with code:', code,  'NodeRunner');
                 resolve();
             });
         });

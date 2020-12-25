@@ -19,8 +19,8 @@ WORKDIR /app
 
 STOPSIGNAL SIGINT
 
-ADD .docker/runner/predownload_dump.sh /docker-entrypoint.d/
-RUN chmod +x /docker-entrypoint.d/predownload_dump.sh
+#ADD .docker/runner/predownload_dump.sh /docker-entrypoint.d/
+#RUN chmod +x /docker-entrypoint.d/predownload_dump.sh
 
 ENV NODE_OPTIONS="--enable-source-maps"
 CMD ["node", "app.js"]

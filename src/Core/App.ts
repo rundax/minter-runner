@@ -25,7 +25,7 @@ export class Core {
     public static bootstrap(info: AppInfo, coreConfig: CoreConfigInterface):void {
         Core.$self = new Core(coreConfig);
         Core.appInfo = info;
-        Core.debug('Hello ' + info.id, {version: info.version, env: info.environment});
+        Core.info('Hello ' + info.id, {version: info.version, env: info.environment});
         Core.info('Bootstrap system');
 
     }

@@ -27,18 +27,20 @@ spec:
       envFrom:
         - secretRef:
             name: {{ .Values.app.secretPrefix }}-generic
-      readinessProbe:
-        httpGet:
-          path: /probe/ready
-          port: node-api
-      livenessProbe:
-        httpGet:
-          path: /probe/liveness
-          port: node-api
+{{/*      readinessProbe:*/}}
+{{/*        httpGet:*/}}
+{{/*          path: /probe/ready*/}}
+{{/*          port: node-api*/}}
+{{/*      livenessProbe:*/}}
+{{/*        httpGet:*/}}
+{{/*          path: /probe/liveness*/}}
+{{/*          port: node-api*/}}
       startupProbe:
         httpGet:
           path: /probe/ready
           port: node-api
-        failureThreshold: 30
-        periodSeconds: 10
+        initialDelaySeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 300
+        periodSeconds: 5
 {{- end }}

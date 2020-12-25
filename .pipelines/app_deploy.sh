@@ -20,7 +20,9 @@ function app_deploy() {
         "\
             --atomic \
             --debug \
+            --timeout 1800s \
             --set env=$HELM_ENV \
+            --set replicaCount=$KUBE_REPLICA_COUNT \
             --set project_name=$CI_PROJECT_NAME \
             --set app.secretPrefix=$CI_PROJECT_NAME \
             --set ingress.hostName=$KUBE_INGRESS_HOSTNAME \

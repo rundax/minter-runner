@@ -32,7 +32,7 @@ fi
 
 
 #. .pipelines/build_images.sh
-. .pipelines/app_image.sh
+#. .pipelines/app_image.sh
 #. .pipelines/app_test.sh
-. .pipelines/prerequisites.sh
+#. .pipelines/prerequisites.sh
 . .pipelines/app_deploy.sh
