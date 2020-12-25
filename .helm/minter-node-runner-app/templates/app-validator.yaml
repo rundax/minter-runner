@@ -8,39 +8,5 @@ metadata:
   annotations:
     rollme: {{ randAlphaNum 5 | quote }}
 spec:
-  containers:
-    - name: {{ .Chart.Name }}-validator
-      image: "{{ .Values.image.repository.host }}:{{ .Values.image.repository.port }}/{{ .Values.image.repository.project }}/{{ .Values.image.repository.app_name }}/{{ .Values.image.repository.env }}:{{ .Values.image.tag }}"
-      imagePullPolicy: {{ .Values.image.pullPolicy }}
-      ports:
-        - name: node-api
-          containerPort: 3000
-        - name: node-prom-stats
-          containerPort: 26660
-        - name: node-p2p
-          containerPort: 26656
-        - name: node-rpc
-          containerPort: 26657
-      volumeMounts:
-        - mountPath: '/app/data/'
-          name: {{ .Values.app.secretPrefix }}-volume
-      envFrom:
-        - secretRef:
-            name: {{ .Values.app.secretPrefix }}-generic
-{{/*      readinessProbe:*/}}
-{{/*        httpGet:*/}}
-{{/*          path: /probe/ready*/}}
-{{/*          port: node-api*/}}
-{{/*      livenessProbe:*/}}
-{{/*        httpGet:*/}}
-{{/*          path: /probe/liveness*/}}
-{{/*          port: node-api*/}}
-      startupProbe:
-        httpGet:
-          path: /probe/ready
-          port: node-api
-        initialDelaySeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 300
-        periodSeconds: 5
+
 {{- end }}

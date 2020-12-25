@@ -11,6 +11,7 @@ function build_base_image() {
             --build-arg DOCKER_PROJECT_PATH=$DOCKER_PROJECT_PATH \
             --build-arg DOCKER_NODE_VERSION=$DOCKER_NODE_VERSION \
             --build-arg DOCKER_MINTER_DOWNLOAD_URL=$DOCKER_MINTER_DOWNLOAD_URL \
+            --build-arg DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION \
         "
     docker push ${IMAGE}
 }
