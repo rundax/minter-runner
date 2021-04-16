@@ -24,3 +24,7 @@ build_base_image "BUILD node-base" \
 build_base_image "BUILD node-minter" \
     "$DOCKER_SERVER_HOST:$DOCKER_SERVER_PORT/$DOCKER_PROJECT_PATH/node${DOCKER_NODE_VERSION}-minter:$DOCKER_IMAGE_VERSION" \
     ".docker/node${DOCKER_NODE_VERSION}-minter/"
+
+build_base_image "BUILD node-yarn" \
+    "$DOCKER_SERVER_HOST:$DOCKER_SERVER_PORT/$DOCKER_PROJECT_PATH/node${DOCKER_NODE_VERSION}-yarn:$DOCKER_IMAGE_VERSION" \
+    ".docker/node${DOCKER_NODE_VERSION}-yarn/"

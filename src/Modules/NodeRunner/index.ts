@@ -13,6 +13,7 @@ import {ProbeReadyEvents, ProbeReadyServiceStatus} from '@Core/Probe';
 export class NodeRunner extends BaseModule<NodeRunner> {
 
     public static readonly  STOP_SIGNAL = 'SIGTERM';
+    public static readonly  SERVICE_ID = 'NodeRunner';
 
     private blockHeight: number;
     private daemon?: ChildProcess = null;
@@ -27,7 +28,7 @@ export class NodeRunner extends BaseModule<NodeRunner> {
     }
 
     public init(): Promise<boolean | NodeRunner> {
-        this.bus.emit(ProbeReadyEvents.REGISTER_SERVICE, 'NodeRunner');
+        this.bus.emit(ProbeReadyEvents.REGISTER_SERVICE, NodeRunner.SERVICE_ID);
         return Promise.resolve(this);
     }
 
@@ -48,7 +49,7 @@ export class NodeRunner extends BaseModule<NodeRunner> {
                         return reject();
                     }
                     let readyProbe: ProbeReadyServiceStatus = {
-                        serviceId: 'NodeRunner',
+                        serviceId: NodeRunner.SERVICE_ID,
                         isReady: false,
                         state: 'Spawn new process'
                     };
@@ -66,7 +67,7 @@ export class NodeRunner extends BaseModule<NodeRunner> {
                     this.subscribeOnDaemonEvents();
                     this.configurePipes();
                     let readyProbeDone: ProbeReadyServiceStatus = {
-                        serviceId: 'NodeRunner',
+                        serviceId: NodeRunner.SERVICE_ID,
                         isReady: true,
                         state: 'SubProcess run'
                     };

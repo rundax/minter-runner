@@ -8,9 +8,8 @@ try
   namespace_secret_additional_project_registry ${CI_PROJECT_NAME} ${CI_REGISTRY_USER} ${CI_JOB_TOKEN}
 
   ${KUBECTL} -n ${KUBE_NAMESPACE} create secret generic ${CI_PROJECT_NAME}-generic \
-      --from-literal=APP_NAME="minter-node-runner" \
+      --from-literal=APP_NAME="minter-node" \
       --from-literal=APP_ENV="${APP_ENV}" \
-      --from-literal=APP_DEBUG="${APP_DEBUG}" \
       --from-literal=APP_VERSION="${CI_COMMIT_REF_NAME}" \
       \
       --from-literal=APP_SENTRY_ENABLED="${APP_SENTRY_ENABLED}" \
@@ -28,6 +27,7 @@ try
       --from-literal=APP_BLOCKCHAIN_GENESIS_FILE_LINK="${APP_BLOCKCHAIN_GENESIS_FILE_LINK}" \
       --from-literal=APP_CONFIGURATOR_P2P_SEEDS="${APP_CONFIGURATOR_P2P_SEEDS}" \
       --from-literal=APP_CONFIGURATOR_GENERAL_MONIKER="${APP_CONFIGURATOR_GENERAL_MONIKER}" \
+      --from-literal=APP_CONFIGURATOR_GENERAL_LOG_LEVEL="${APP_CONFIGURATOR_GENERAL_LOG_LEVEL}" \
       --from-literal=APP_BLOCKCHAIN_IS_TESTNET="${APP_BLOCKCHAIN_IS_TESTNET}" \
       \
   -o yaml --dry-run | ${KUBECTL} -n ${KUBE_NAMESPACE} replace --force -f -

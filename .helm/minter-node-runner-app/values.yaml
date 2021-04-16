@@ -1,14 +1,10 @@
 replicaCount: 1
-project_name: minter-node-runner
 
 image:
-  repository:
-    host: ''
-    port: ''
-    project: ''
-    app_name: ''
-    env: ''
-  tag: ''
+  registry: "null:5001"
+  repository: null-value
+  tag: null-value
+  pullSecret: null-value
 
   pullPolicy: Always
   secret_prefix: docker-registry
@@ -26,15 +22,14 @@ monitoring:
 
 app:
   isValidator: false
-  secretPrefix: node-runner
+  secretPrefix: null-value
 
 ingress:
   enabled: true
   secretName: ingress-cert
+  hostName: localhost
+  path: /
 
-release:
-  branch: master
-  hash: sha34512
 
 ## Persist data to a persistent volume
 persistence:

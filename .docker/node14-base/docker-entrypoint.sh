@@ -5,6 +5,11 @@ set -u
 set -o pipefail
 
 
+if [[ $1 == "bash" ]]; then
+  exec /bin/bash
+  exit;
+fi
+
 # Path to scripts to source
 CONFIG_DIR="/docker-entrypoint.d"
 
@@ -21,4 +26,5 @@ done
 echo
 echo 'Init process done. Ready for start up.'
 echo
+
 exec "${@}"

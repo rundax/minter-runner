@@ -1,38 +1,43 @@
 #!/usr/bin/env bash
 function app_deploy() {
-    echo "$(tput bold)$(tput setb 4)$(tput setaf 3)$1$(tput sgr0)"
-    HELM_APP_NAME=$2
-    rancher_login && helm_cluster_login
 
+    echo "$(tput bold)$(tput setb 4)$(tput setaf 3)$1$(tput sgr0)"
+    HELM_CHART_NAME=$2
+    HELM_APP_NAME=$3
+    rancher_login && helm_cluster_login
     sed \
-        -e "s#__RELEASE_BRANCH__#${GIT_BRANCH}#g" \
+        -e "s#__CHART_NAME__#${HELM_CHART_NAME}#g" \
+        -e "s#__APP_NAME__#${HELM_APP_NAME}#g" \
+        -e "s#__RELEASE_BRANCH__#${HELM_ENV}#g" \
         -e "s#__RELEASE_HASH__#${HELM_ENV}#g" \
         \
-        .helm/${CI_PROJECT_NAME}-${HELM_APP_NAME}/Chart.template.yaml > \
-        .helm/${CI_PROJECT_NAME}-${HELM_APP_NAME}/Chart.yaml
+        .helm/${HELM_CHART_NAME}/Chart.template.yaml > \
+        .helm/${HELM_CHART_NAME}/Chart.yaml
 
     ${HELM} --namespace ${KUBE_NAMESPACE} list
-#    ${HELM} --namespace ${KUBE_NAMESPACE} uninstall ${CI_PROJECT_NAME}-${HELM_APP_NAME}
+#    ${HELM} --namespace ${KUBE_NAMESPACE} uninstall ${HELM_APP_NAME}
 
-    helm_deploy \
-        ${CI_PROJECT_NAME}-${HELM_APP_NAME} \
-        ${DOCKER_IMAGE_VERSION} \
-        "\
-            --atomic \
-            --debug \
-            --timeout 1800s \
-            --set env=$HELM_ENV \
-            --set replicaCount=$KUBE_REPLICA_COUNT \
-            --set project_name=$CI_PROJECT_NAME \
-            --set app.secretPrefix=$CI_PROJECT_NAME \
-            --set ingress.hostName=$KUBE_INGRESS_HOSTNAME \
-            --set ingress.path=$KUBE_INGRESS_PATH \
-            --set image.repository.host=$DOCKER_SERVER_HOST \
-            --set image.repository.port=$DOCKER_SERVER_PORT \
-            --set image.repository.project=$DOCKER_PROJECT_PATH \
-            --set image.repository.app_name=$HELM_APP_NAME \
-            --set image.repository.env=dev \
-        "
+    $HELM upgrade \
+       --debug \
+       --wait \
+       --namespace ${KUBE_NAMESPACE} \
+       --install ${HELM_APP_NAME} \
+       .helm/${HELM_CHART_NAME} \
+       \
+       --set image.registry=${DOCKER_SERVER_HOST}:${DOCKER_SERVER_PORT} \
+       --set image.repository=${DOCKER_PROJECT_PATH}/app \
+       --set image.tag=${DOCKER_IMAGE_VERSION} \
+       --set image.pullSecret=docker-registry-${CI_PROJECT_NAME} \
+       \
+       --set app.secretPrefix=${CI_PROJECT_NAME} \
+       \
+       --set ingress.hostName=$KUBE_INGRESS_HOSTNAME \
+       --set ingress.path=$KUBE_INGRESS_PATH \
+       \
+       --set replicaCount=$KUBE_REPLICA_COUNT
 }
 
-app_deploy "Deploy helm dev_job" "app"
+app_deploy \
+    "Deploy helm node runner app" \
+    "minter-node-runner-app" \
+    "node-runner"

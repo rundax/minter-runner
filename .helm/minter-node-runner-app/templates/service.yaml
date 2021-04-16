@@ -35,5 +35,5 @@ spec:
       name: node-api
       protocol: TCP
   selector:
-    "app.kubernetes.io/name": '{{ .Chart.Name }}'
-    "app.kubernetes.io/release": "{{ .Release.Name }}"
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

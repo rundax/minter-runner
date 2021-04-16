@@ -1,4 +1,5 @@
 export interface TomlGeneralConfigInterface {
+    halt_height: number;
     moniker: string;
     api_listen_addr: string;
     grpc_listen_addr: string;

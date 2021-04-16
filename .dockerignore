@@ -5,14 +5,16 @@ test_env
 .gitignore
 .gitmodules
 .helm
-docker-compose.yml
+docker-compose*
 Makefile
 .pipelines
 .gitlab-ci-functions
 LICENSE
 .editorconfig
+.dockerignore
 .docker/config.json
 .helm/cluster.yml
 .pipelines/.env.*
 .git
 .idea
+.travis.yml

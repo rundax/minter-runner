@@ -70,6 +70,7 @@ export class ConfigFactory {
                 genesisFileLink: env('APP_BLOCKCHAIN_GENESIS_FILE_LINK', ''),
                 toml: {
                     general: {
+                        halt_height: envNumber('APP_CONFIGURATOR_GENERAL_HALT_HEIGHT', 0, 1),
                         moniker: env('APP_CONFIGURATOR_GENERAL_MONIKER', 'rundax-minter-runner'),
                         api_listen_addr: env('APP_CONFIGURATOR_GENERAL_API_LISTEN_ADDR', 'tcp://0.0.0.0:8841'),
                         grpc_listen_addr: env('APP_CONFIGURATOR_GENERAL_GRPC_LISTEN_ADDR', 'tcp://0.0.0.0:8842'),
@@ -112,16 +113,16 @@ export class ConfigFactory {
                         private_peer_ids: env('APP_CONFIGURATOR_P2P_PRIVATE_PEER_IDS', ''),
                     },
                     mempool: {
-                        broadcast: envBoolean('APP_CONFIGURATOR_MEMPOOL_', true),
-                        wal_dir: env('APP_CONFIGURATOR_MEMPOOL_', ''),
-                        size: envNumber('APP_CONFIGURATOR_MEMPOOL_', 10000, 2),
-                        cache_size: envNumber('APP_CONFIGURATOR_MEMPOOL_', 100000, 2),
+                        broadcast: envBoolean('APP_CONFIGURATOR_MEMPOOL_BROADCAST', true),
+                        wal_dir: env('APP_CONFIGURATOR_MEMPOOL_WAL_DIR', ''),
+                        size: envNumber('APP_CONFIGURATOR_MEMPOOL_SIZE', 10000, 2),
+                        cache_size: envNumber('APP_CONFIGURATOR_MEMPOOL_CACHE_SIZE', 100000, 2),
                     },
                     instrumentation: {
-                        prometheus: envBoolean('APP_CONFIGURATOR_INSTRUMENTATION_', false),
-                        prometheus_listen_addr: env('APP_CONFIGURATOR_INSTRUMENTATION_', ':26660'),
-                        max_open_connections: envNumber('APP_CONFIGURATOR_INSTRUMENTATION_', 3, 2),
-                        namespace: env('APP_CONFIGURATOR_INSTRUMENTATION_', 'minter'),
+                        prometheus: envBoolean('APP_CONFIGURATOR_INSTRUMENTATION_PROMETHEUS', false),
+                        prometheus_listen_addr: env('APP_CONFIGURATOR_INSTRUMENTATION_PROMETHEUS_LISTEN_ADDR', ':26660'),
+                        max_open_connections: envNumber('APP_CONFIGURATOR_INSTRUMENTATION_MAX_OPEN_CONNECTIONS', 3, 2),
+                        namespace: env('APP_CONFIGURATOR_INSTRUMENTATION_NAMESPACE', 'minter'),
                     }
                 }
             }

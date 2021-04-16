@@ -10,9 +10,9 @@ export PROD_ENV=staging
 export DEV_ENV=dev
 
 #---------------DEV vars -------------
-export KUBE_NAMESPACE_PREFIX=minter-node-runner
+export KUBE_NAMESPACE_PREFIX=minter-node
 export KUBE_INGRESS_PATH=/
-export CI_PROJECT_NAME=minter-node-runner
+export CI_PROJECT_NAME=minter-node
 
 
 source .pipelines/.env
@@ -31,8 +31,8 @@ fi
 . .pipelines/before_step.sh
 
 
-. .pipelines/build_images.sh
-. .pipelines/app_image.sh
+#. .pipelines/build_images.sh
+#. .pipelines/app_image.sh
 #. .pipelines/app_test.sh
 . .pipelines/prerequisites.sh
 . .pipelines/app_deploy.sh

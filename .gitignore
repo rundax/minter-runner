@@ -102,6 +102,9 @@ dist
 .tern-port
 
 .docker/config.json
+.docker/.buildNodeID
+.docker/.token_seed
+.docker/.token_seed.lock
 .helm/cluster.yml
 .pipelines/.env.*
 .env.local

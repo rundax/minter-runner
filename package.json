@@ -2,8 +2,8 @@
   "name": "minter-node-runner",
   "scripts": {
     "start": "node app.js",
-    "build-dev": "webpack --mode development --progress ",
-    "build-pord": "webpack --no-color --mode production",
+    "build-dev": "webpack --mode development --progress",
+    "build-prod": "webpack --mode production --progress",
     "app": "/usr/local/bin/pm2-dev ./dist/app.js",
     "test": "mocha -r ts-node/register test/index.test.ts",
     "lint": "tslint -c tslint.json \"./src/**/*.ts\"",
