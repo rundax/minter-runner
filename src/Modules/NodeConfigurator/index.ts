@@ -14,7 +14,6 @@ import {
 import {Core} from '@Core/App';
 import {BaseModule} from '@Core/BaseModule';
 import {Error, FatalError} from 'tslint/lib/error';
-import {reject} from 'async';
 
 export class NodeConfigurator extends BaseModule<NodeConfigurator> {
 

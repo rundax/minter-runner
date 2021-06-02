@@ -63,7 +63,7 @@ export class NodeRunner extends BaseModule<NodeRunner> {
                     this.bus.emit(ProbeReadyEvents.UPDATE_SERVICE, readyProbe);
                     this.daemon = spawn(this.options.binFilePath, config);
 
-                    Core.info('Config: ', [this.options.binFilePath + ' node --home-dir=' + this.options.home], 'NodeRunner');
+                    Core.info('Config: ', [this.options.binFilePath + config.join(' ')], 'NodeRunner');
                     this.subscribeOnDaemonEvents();
                     this.configurePipes();
                     let readyProbeDone: ProbeReadyServiceStatus = {

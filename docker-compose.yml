@@ -2,9 +2,10 @@ version: "3.7"
 services:
   app:
     container_name: ${APP_PROJECT_NAME}_app
-    image: ${DOCKER_SERVER_HOST}:${DOCKER_SERVER_PORT}/${DOCKER_PROJECT_PATH}/node${DOCKER_NODE_VERSION}-minter:${DOCKER_IMAGE_VERSION}
+    image: ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/node${DOCKER_NODE_VERSION}-yarn:${DOCKER_IMAGE_VERSION}
     stop_signal: INT
     user: 1000:1000
+    working_dir: /app
     tty: true
     volumes:
       - ./:/app:rw

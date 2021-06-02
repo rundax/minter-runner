@@ -24,7 +24,7 @@ function app_deploy() {
        --install ${HELM_APP_NAME} \
        .helm/${HELM_CHART_NAME} \
        \
-       --set image.registry=${DOCKER_SERVER_HOST}:${DOCKER_SERVER_PORT} \
+       --set image.registry=${DOCKER_SERVER_HOST} \
        --set image.repository=${DOCKER_PROJECT_PATH}/app \
        --set image.tag=${DOCKER_IMAGE_VERSION} \
        --set image.pullSecret=docker-registry-${CI_PROJECT_NAME} \

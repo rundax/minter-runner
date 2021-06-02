@@ -7,6 +7,7 @@ import {SentryTarget} from '@elementary-lab/logger/src/Targets/SentryTarget';
 import {LogLevel} from '@elementary-lab/logger/src/Types';
 import {AppInfo, CoreConfigInterface} from '@Core/App';
 import {ConfigFileInterface} from '../Modules/NodeConfigurator';
+import {NodeStatusPageConfig} from '../Modules/NodeStatusPage';
 
 export class ConfigFactory {
 
@@ -98,7 +99,7 @@ export class ConfigFactory {
                     p2p: {
                         laddr: env('APP_CONFIGURATOR_P2P_LADDR', 'tcp://0.0.0.0:26656'),
                         external_address: env('APP_CONFIGURATOR_P2P_external_address', ''),
-                        seeds: env('APP_CONFIGURATOR_P2P_SEEDS', '1e1c6149451d2a7c1072523e49cab658080d9bd2@minter-nodes-1.mainnet.btcsecure.io:26656'),
+                        seeds: env('APP_CONFIGURATOR_P2P_SEEDS', ''),
                         persistent_peers: env('APP_CONFIGURATOR_P2P_PERSISTENT_PEERS', ''),
                         upnp: envBoolean('APP_CONFIGURATOR_P2P_UPNP', false),
                         addr_book_strict: envBoolean('APP_CONFIGURATOR_P2P_ADDR_BOOK_STRICT', true),
@@ -125,6 +126,10 @@ export class ConfigFactory {
                         namespace: env('APP_CONFIGURATOR_INSTRUMENTATION_NAMESPACE', 'minter'),
                     }
                 }
+            },
+            statusPage: {
+                enabled: envBoolean('APP_STATUS_PAGE_ENABLED', false),
+                generalApiUrl: env('APP_STATUS_PAGE_GENERAL_API_URL', ''),
             }
         };
     }
@@ -134,4 +139,5 @@ interface ServicesConfigInterface {
     nodeApi: NodeApiConfigInterface;
     nodeRunner: NodeProcessConfig;
     configurator: ConfigFileInterface;
+    statusPage: NodeStatusPageConfig;
 }

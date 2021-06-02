@@ -49,6 +49,10 @@ spec:
               containerPort: 26656
             - name: node-rpc
               containerPort: 26657
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 3Gi
           {{ if (eq .Values.persistence.enabled true) }}
           volumeMounts:
             - mountPath: '/app/data/'

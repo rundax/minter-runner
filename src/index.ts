@@ -10,6 +10,7 @@ import {NodeRunner} from './Modules/NodeRunner';
 import {NodeCli} from './Modules/NodeCli';
 import {Probe} from '@Core/Probe';
 import {NodeSynced} from './Modules/NodeSynced';
+import {NodeStatusPage} from './Modules/NodeStatusPage';
 
 
 const env = loadEnvFile(process.cwd() + '/.env.local');
@@ -36,12 +37,15 @@ const nodeApi = new NodeApi(configServices.nodeApi);
 const nodeConfigurator = new NodeConfigurator(configServices.configurator);
 const nodeCli = new NodeCli(configServices.nodeRunner);
 const nodeSynced = new NodeSynced();
+const nodeStatusPage = new NodeStatusPage(configServices.statusPage);
+
 
 Core.info('Init services');
 
 Promise.all([
     nodeSynced.init(),
     nodeRunner.init(),
+    nodeStatusPage.init(),
     nodeConfigurator.init(),
     nodeApi.init(),
     nodeCli.init()
@@ -64,7 +68,8 @@ function run() {
         nodeSynced.run(),
         nodeRunner.run(),
         nodeConfigurator.run(),
-        nodeApi.run()
+        nodeApi.run(),
+        nodeStatusPage.run()
     ])
         .then(() => {
             Core.info('Base system started');

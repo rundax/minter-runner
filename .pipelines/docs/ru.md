@@ -16,8 +16,7 @@ CI_REGISTRY=registry.company.com:443
 CI_REGISTRY_USER=root
 CI_JOB_TOKEN=root
 
-DOCKER_SERVER_HOST=registry.company.com
-DOCKER_SERVER_PORT=443
+DOCKER_SERVER_HOST=registry.company.com:443
 DOCKER_PROJECT_PATH=minter/node-runner
 DOCKER_NODE_VERSION=14
 DOCKER_IMAGE_VERSION=master
