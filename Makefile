@@ -1,6 +1,8 @@
 include .env
 export
 
+include .pipelines/.pipelines-debug.mk
+
 build:
 	docker build .docker/node$(DOCKER_NODE_VERSION)-base/ \
 		-t $(DOCKER_SERVER_HOST)/$(DOCKER_PROJECT_PATH)/node$(DOCKER_NODE_VERSION)-base:$(DOCKER_IMAGE_VERSION) \
