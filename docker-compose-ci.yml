@@ -2,7 +2,7 @@ version: "3.7"
 services:
   app:
     container_name: ${APP_PROJECT_NAME}_app
-    image: ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/node${DOCKER_NODE_VERSION}-base:${DOCKER_IMAGE_VERSION}
+    image: ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/node${DOCKER_NODE_VERSION}-yarn:${DOCKER_IMAGE_VERSION}
     stop_signal: INT
     tty: true
     volumes:
