@@ -1,0 +1,309 @@
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Minter Node GUI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+    <style>
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        html,body,.body,#app {
+            min-height: 100%;
+        }
+
+        .body {
+            padding-top: 15px;
+        }
+
+        .table {
+            margin-bottom: 0;
+            table-layout: fixed;
+        }
+
+        .card-header {
+            font-weight: bold;
+        }
+
+        .card-header {
+            padding-left: 12px;
+        }
+
+        .h {
+            width: 200px;
+            background-color: #f3f3f3;
+            border-right: 1px solid #ccc;
+        }
+
+        .bg-success, .bg-danger {
+            color: white;
+        }
+
+        .bg-danger {
+            border-color: #dc3545 !important;
+        }
+
+        .bg-success {
+            border-color: #28a745 !important;
+        }
+
+        .fa-check {
+            color: green;
+        }
+
+        .fa-exclamation-circle {
+            color: red;
+        }
+    </style>
+</head>
+<body style="background-color: #343a401a">
+<div id="app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1"><i class="fas fa-terminal"></i> &nbsp; Minter Full Node Status</span>
+        </div>
+    </nav>
+    <div class="container body" v-if="error">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error while connecting to local node</h4>
+            <p class="mb-0">${ error }</p>
+        </div>
+    </div>
+    <div class="container body bg-white" v-if="status && !error">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Node Info
+                    </div>
+                    <table class="table card-body">
+                        <tbody>
+                        <tr>
+                            <td class="h">Moniker</td>
+                            <td>${ status.moniker }</td>
+                        </tr>
+                        <tr>
+                            <td class="h">Node ID</td>
+                            <td>${ status.node_id }</td>
+                        </tr>
+                        <tr>
+                            <td class="h">Network ID</td>
+                            <td>${ status.network }</td>
+                        </tr>
+                        <tr>
+                            <td class="h">Minter Version</td>
+                            <td>${ version }</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card" v-if="net_info">
+                    <div class="card-header">
+                        Net Info
+                    </div>
+                    <table class="table card-body">
+                        <tbody>
+                        <tr>
+                            <td class="h">Is Listening</td>
+                            <td><i :class="{'fa-check': net_info.listening}" class="fas"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="h">Connected Peers</td>
+                            <td>${ net_info.count_peers } <i :class="{'fa-exclamation-circle': net_info.count_peers < 1}" class="fas"></i></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Syncing Info
+                    </div>
+                    <table class="table card-body">
+                        <tbody>
+                        <tr>
+                            <td class="h">Is Synced</td>
+                            <td>
+                                <span v-if="status.catching_up">No</span>
+                                <span v-if="!status.catching_up">Yes</span>
+                                <i :class="{'fa-check': !status.catching_up, 'fa-exclamation-circle': status.catching_up}" class="fas"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="h">Latest Block Height</td>
+                            <td>
+                                ${ status.latest_block_height }
+                                <!-- <span v-if="masterStatus && status.network == masterStatus.network && Number(status.latest_block_height) <= Number(masterStatus.latest_block_height)" class="text-muted">-->
+                                of ${ masterStatus.latest_block_height }
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="h">Latest Block Time</td>
+                            <td>
+                                ${ status.latest_block_time }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="h">Keep Last States</td>
+                            <td>
+                                ${ status.keep_last_states }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="h">Total Slashed</td>
+                            <td>
+                                ${ status.total_slashed }
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        Validator Info
+                    </div>
+
+                    <table class="table card-body">
+                        <tbody>
+                        <tr>
+                            <td class="h">Public Key</td>
+                            <td>${ this.status.public_key }</td>
+                        </tr>
+
+                        <tr>
+                            <td class="h">Status</td>
+                            <td>${ validatorStatus }</td>
+                        </tr>
+
+                        <tr>
+                            <td class="h">Total Stake</td>
+                            <td>${ stake } BIP</td>
+                        </tr>
+                        <tr>
+                            <td class="h">commission</td>
+                            <td>${ comission } %</td>
+                        </tr>
+                        <tr>
+                            <td class="h">Used Slots</td>
+                            <td>${ used_slots } </td>
+                        </tr>
+                        <tr>
+                            <td class="h">Jailed</td>
+                            <td>${ jailed_until } </td>
+                        </tr>
+
+
+                        <!--
+                                                <tr>
+                                                    <td>Voting Power</td>
+                                                    <td>${ niceNum(status.validator_info.voting_power) } <span class="text-muted">of 100,000,000</span></td>
+                                                </tr>
+                        -->
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['${', '}'],
+        data: {
+            masterStatus: null,
+            status: null,
+            version: null,
+            net_info: null,
+            error: null,
+            validatorPubKey: '...',
+            validatorStatus: '...',
+            stake: '...',
+            commission: '',
+            used_slots: '',
+            jailed_until: 'No'
+        },
+        mounted() {
+            this.refresh()
+        },
+        methods: {
+            niceNum(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            },
+            base64ToHex(base64) {
+                return CryptoJS.enc.Base64.parse(base64).toString()
+            },
+            refresh() {
+                axios.all([
+                    axios.get("//" + window.location.hostname + '/api/v2/status'),
+                    axios.get("//" + window.location.hostname + '/api/v2/net_info'),
+                ]).then(axios.spread(function (status, net_info) {
+                    this.error = null
+
+                    this.status = status.data
+                    this.version = status.data.version
+                    this.net_info = net_info.data
+
+                    this.validatorPubKey = status.public_key
+
+                    axios.all([
+                        axios.get("//" + window.location.hostname + '/api/v2/validators'),
+                        axios.get("//" + window.location.hostname + '/api/v2/candidate/' +  status.data.public_key),
+                    ]).then(axios.spread(function (validators, candidate) {
+
+                        this.stake = Math.round(candidate.data.total_stake / Math.pow(10, 17)) / 10
+                        this.commission = candidate.data.commission;
+                        this.used_slots = candidate.data.used_slots;
+                        if(candidate.data.jailed_until!=0){
+                            this.jailed_until = candidate.data.jailed_until;
+                        }
+
+
+                        this.validatorStatus = 'Not declared';
+
+
+                        if (candidate.data.validator==true) {
+                            this.validatorStatus = 'Validating';
+                            return
+                        }
+
+                        if (candidate.data.status == 2 && candidate.data.validator==false) {
+                            this.validatorStatus = 'Candidate'
+                            return
+                        }
+                        if (candidate.data.status == 1){
+                            this.validatorStatus = 'Down';
+                            return
+                        }
+                    }.bind(this))).catch(function()  {
+                        this.validatorStatus = 'Not declared';
+                        this.stake = 0;
+                    }.bind(this));
+
+                    setTimeout(this.refresh, 2000)
+                }.bind(this))).catch(function (reason) {
+                    this.error = reason.toString();
+                    setTimeout(this.refresh, 2000)
+                }.bind(this))
+
+                axios.get("{{ generalApiUrl }}").then(function (masterStatus) {
+                    this.masterStatus = masterStatus.data
+                }.bind(this))
+            }
+        }
+    })
+</script>
+</body>
+</html>
