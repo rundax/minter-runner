@@ -9,6 +9,7 @@ env:
     - DOCKER_SERVER_HOST=docker.local
     - DOCKER_PROJECT_PATH=rundax/minter/node-runner
     - DOCKER_NODE_VERSION=14
+    - DOCKER_MINTER_DOWNLOAD_URL=https://github.com/MinterTeam/minter-go-node/releases/download/v2.3.0/minter_2.3.0_1218ceb1_linux_amd64.zip
 
 before_install:
   - docker -D info
