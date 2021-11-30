@@ -76,33 +76,6 @@ spec:
             failureThreshold: 300
             periodSeconds: 2
             initialDelaySeconds: 10
-        {{ if (eq .Values.monitoring.enabled true) }}
-        - name: {{ .Chart.Name }}-api-metrics
-          image: {{ .Values.monitoring.app.image }}
-          command:
-            - /usr/bin/node
-            - index
-            - {{ .Values.monitoring.app.command }}
-          ports:
-            - name: api-metrics
-              containerPort: 9697
-          readinessProbe:
-            httpGet:
-              path: /probe/liveness
-              port: node-api
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /probe/liveness*/}}
-{{/*              port: node-api*/}}
-          startupProbe:
-            httpGet:
-              path: /probe/ready
-              port: node-api
-            initialDelaySeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 300
-            periodSeconds: 5
-        {{- end }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

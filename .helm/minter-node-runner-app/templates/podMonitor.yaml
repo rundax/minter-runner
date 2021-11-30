@@ -1,19 +1,16 @@
-{{/*{{ if .Values.monitoring.enabled }}*/}}
-{{/*apiVersion: monitoring.coreos.com/v1*/}}
-{{/*kind: PodMonitor*/}}
-{{/*metadata:*/}}
-{{/*  name: {{ .Chart.Name }}*/}}
-{{/*  labels:*/}}
-{{/*    team: frontend*/}}
-{{/*    "app.kubernetes.io/name": '{{ .Chart.Name }}'*/}}
-{{/*    "field.cattle.io/projectId": "{{ .Values.monitoring.appProjectId }}"*/}}
-{{/*spec:*/}}
-{{/*  podMetricsEndpoints:*/}}
-{{/*    - interval: 5s*/}}
-{{/*      port: api-metrics*/}}
-{{/*      path: /metrics*/}}
-{{/*  jobLabel: {{ .Chart.Name }}*/}}
-{{/*  selector:*/}}
-{{/*    matchLabels:*/}}
-{{/*      "app.kubernetes.io/name": '{{ .Chart.Name }}'*/}}
-{{/*{{- end }}*/}}
+{{ if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  podMetricsEndpoints:
+    - interval: 5s
+      port: node-prom-stats
+      path: /metrics
+  jobLabel: {{ .Chart.Name }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Chart.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

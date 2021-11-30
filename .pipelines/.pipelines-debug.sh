@@ -10,15 +10,23 @@ export PROD_ENV=staging
 export DEV_ENV=dev
 
 #---------------DEV vars -------------
+export ADMIN_EMAIL=root@localhost
 export KUBE_NAMESPACE_PREFIX=minter-node
-export KUBE_INGRESS_PATH=/
 export CI_PROJECT_NAME=minter-node
+export KUBE_INGRESS_PATH=/
 
 
 source .pipelines/.env
 if [ -f ".pipelines/.env.local" ]; then
     source .pipelines/.env.local
 fi
+
+if [ -f ".pipelines/.env.json" ]; then
+    for s in $(cat .pipelines/.env.json | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ); do
+        export $s
+    done
+fi
+
 
 #import functions
 . .gitlab-ci-functions/docker.sh
@@ -31,8 +39,8 @@ fi
 . .pipelines/before_step.sh
 
 
-. .pipelines/build_images.sh
-. .pipelines/app_image.sh
-. .pipelines/app_test.sh
-. .pipelines/prerequisites.sh
+#. .pipelines/build_images.sh
+#. .pipelines/app_image.sh
+#. .pipelines/app_test.sh
+#. .pipelines/prerequisites.sh
 . .pipelines/app_deploy.sh

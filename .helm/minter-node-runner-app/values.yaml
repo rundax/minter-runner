@@ -13,12 +13,6 @@ image:
 
 monitoring:
   enabled: false
-#  appProjectId: "p-wgmtr"
-#  prometeusNamespace: "cattle-prometheus-p-wgmtr"
-  app:
-    image: dmi7ry/tendermint-prometheus-exporter:latest
-    command: serve --target http://localhost:3000/api --status --net-info
-    pullPolicy: Always
 
 app:
   isValidator: false
