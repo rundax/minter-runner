@@ -6,10 +6,8 @@ function app_deploy() {
     HELM_APP_NAME=$3
     rancher_login && helm_cluster_login
     sed \
-        -e "s#__CHART_NAME__#${HELM_CHART_NAME}#g" \
         -e "s#__APP_NAME__#${HELM_APP_NAME}#g" \
-        -e "s#__RELEASE_BRANCH__#${HELM_ENV}#g" \
-        -e "s#__RELEASE_HASH__#${HELM_ENV}#g" \
+        -e "s#__APP_VERSION__#${DOCKER_IMAGE_VERSION}#g" \
         \
         .helm/${HELM_CHART_NAME}/Chart.template.yaml > \
         .helm/${HELM_CHART_NAME}/Chart.yaml
@@ -17,7 +15,7 @@ function app_deploy() {
     ${HELM} --namespace ${KUBE_NAMESPACE} list
 #    ${HELM} --namespace ${KUBE_NAMESPACE} uninstall ${HELM_APP_NAME}
 
-    $HELM upgrade \
+    ${HELM} upgrade \
        --debug \
        --wait \
        --namespace ${KUBE_NAMESPACE} \
@@ -26,15 +24,16 @@ function app_deploy() {
        \
        --set image.registry=${DOCKER_SERVER_HOST} \
        --set image.repository=${DOCKER_PROJECT_PATH}/app \
+       --set image.hash=$(docker images --no-trunc --quiet ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/app:${DOCKER_IMAGE_VERSION}) \
        --set image.tag=${DOCKER_IMAGE_VERSION} \
        --set image.pullSecret=docker-registry-${CI_PROJECT_NAME} \
        \
-       --set app.secretPrefix=${CI_PROJECT_NAME} \
+       --set app.externalSecrets[0]=${CI_PROJECT_NAME}-generic \
        \
-       --set ingress.hostName=$KUBE_INGRESS_HOSTNAME \
-       --set ingress.path=$KUBE_INGRESS_PATH \
+       --set ingress.hostName=${KUBE_INGRESS_HOSTNAME} \
+       --set ingress.path=${KUBE_INGRESS_PATH} \
        \
-       --set replicaCount=$KUBE_REPLICA_COUNT
+       --set replicaCount=${KUBE_REPLICA_COUNT}
 }
 
 app_deploy \

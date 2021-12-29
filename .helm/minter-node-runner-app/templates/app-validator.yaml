@@ -5,8 +5,6 @@ metadata:
   labels:
     "app.kubernetes.io/name": '{{ .Chart.Name }}'
     "app.kubernetes.io/release": "{{ .Release.Name }}"
-  annotations:
-    rollme: {{ randAlphaNum 5 | quote }}
 spec:
 
 {{- end }}

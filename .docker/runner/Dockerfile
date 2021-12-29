@@ -13,8 +13,6 @@ RUN apk update && \
 
 COPY --from=app /app/dist /app
 
-USER minter-runner
-
 WORKDIR /app
 
 STOPSIGNAL SIGINT

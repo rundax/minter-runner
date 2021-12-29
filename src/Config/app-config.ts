@@ -13,7 +13,7 @@ export class ConfigFactory {
 
     public static getBase(): AppInfo {
         return {
-            id: env('APP_NAME', 'app'),
+            id: 'minter-node-runner',
             version: env('APP_VERSION'),
             environment: env('APP_ENV'),
         };

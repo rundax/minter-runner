@@ -1,6 +1,6 @@
 FROM alpine:3.12
 
-ENV NODE_VERSION 14.16.1
+ENV NODE_VERSION 14.18.2
 
 RUN apk add --no-cache \
         libstdc++ \
@@ -10,7 +10,7 @@ RUN apk add --no-cache \
       && case "${alpineArch##*-}" in \
         x86_64) \
           ARCH='x64' \
-          CHECKSUM="39fbbd09668472f1105bdb5a7c20675bd91649543d2bc25b6edc1293835661f1" \
+          CHECKSUM="7a1a1a18e51ad20245fc366a0848cdb55e968094c807a094555ec2c214e8e9c6" \
           ;; \
         *) ;; \
       esac \
@@ -46,9 +46,8 @@ RUN apk add --no-cache \
       108F52B48DB57BB0CC439B2997B01419BD92F80A \
       B9E2F5981AA6E0CD28160D9FF13993A75599653C \
     ; do \
-      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+      gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$key" || \
+      gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key" ; \
     done \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.xz" \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -73,9 +72,6 @@ RUN apk add --no-cache \
 RUN apk update && \
     apk upgrade && \
     apk add bash
-
-
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 # Must set this value for the bash shell to source
 # the '/etc/bashrc' file.

@@ -2,44 +2,64 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ $.Release.Name }}
   labels:
-    "app.kubernetes.io/name": '{{ .Chart.Name }}'
+    helm.sh/chart-name: {{ $.Chart.Name }}
+    helm.sh/chart-verion: {{ $.Chart.Version }}
+    app.kubernetes.io/name: {{ $.Release.Name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+  annotations:
+    metadata/deployed-by: {{ $.Values.metadata.deployedBy | quote }}
+    metadata/pipline-url: {{ $.Values.metadata.piplineUrl | quote }}
 spec:
-  serviceName: {{ .Chart.Name }}
-  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ $.Chart.Name }}
+  replicas: {{ $.Values.replicaCount }}
   updateStrategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Chart.Name }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: {{ $.Chart.Name }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Chart.Name }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ $.Chart.Name }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
       annotations:
-        rollme: {{ randAlphaNum 5 | quote }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        checksum/image-hash: {{ $.Values.image.hash | quote }}
     spec:
+      {{- if $.Values.podSecurityContext.enabled }}
+      securityContext: {{- omit $.Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+
       terminationGracePeriodSeconds: 30
-      serviceAccountName: {{ .Chart.Name }}-nodeport
       imagePullSecrets:
-        - name: {{ .Values.image.pullSecret }}
+        - name: {{ $.Values.image.pullSecret }}
       initContainers:
         - name: dump-downloader
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ $.Values.image.registry }}/{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
           command: ['node', 'dump_downloader.js']
+
           envFrom:
             - secretRef:
-                name: {{ .Values.app.secretPrefix }}-generic
+                name: {{ $.Release.Name }}-secrets
+
+            {{- range $value := $.Values.app.externalSecrets }}
+            - secretRef:
+                name: {{ $value }}
+            {{- end }}
+
+          {{ if (eq .Values.persistence.enabled true) }}
           volumeMounts:
             - mountPath: '/app/data/'
-              name: {{ .Values.app.secretPrefix }}-volume
+              name: {{ $.Release.Name }}-volume
+          {{- end }}
       containers:
-        - name: {{ .Chart.Name }}-process
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: node
+          image: "{{ $.Values.image.registry }}/{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
             - name: node-api
               containerPort: 3000
@@ -49,33 +69,59 @@ spec:
               containerPort: 26656
             - name: node-rpc
               containerPort: 26657
-          resources:
-            requests:
-              cpu: 1000m
-              memory: 3Gi
+
+          {{- if $.Values.resources.enabled }}
+          resources: {{- omit $.Values.resources "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
           {{ if (eq .Values.persistence.enabled true) }}
           volumeMounts:
             - mountPath: '/app/data/'
-              name: {{ .Values.app.secretPrefix }}-volume
+              name: {{ $.Release.Name }}-volume
           {{- end }}
+
           envFrom:
             - secretRef:
-                name: {{ .Values.app.secretPrefix }}-generic
+                name: {{ $.Release.Name }}-secrets
+
+            {{- range $value := $.Values.app.externalSecrets }}
+            - secretRef:
+                name: {{ $value }}
+            {{- end }}
+
+          {{- if $.Values.readinessProbe.enabled }}
           readinessProbe:
+            initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ $.Values.readinessProbe.successThreshold }}
             httpGet:
               path: /probe/ready
-              port: node-api
+              port: api
+          {{- end }}
+          {{- if $.Values.livenessProbe.enabled }}
           livenessProbe:
-           httpGet:
-             path: /probe/liveness
-             port: node-api
+            initialDelaySeconds: {{ $.Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ $.Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ $.Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: /probe/liveness
+              port: api
+          {{- end }}
+          {{- if $.Values.startupProbe.enabled }}
           startupProbe:
+            initialDelaySeconds: {{ $.Values.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ $.Values.startupProbe.failureThreshold }}
+            successThreshold: {{ $.Values.startupProbe.successThreshold }}
             httpGet:
               path: /probe/ready
-              port: node-api
-            failureThreshold: 300
-            periodSeconds: 2
-            initialDelaySeconds: 10
+              port: api
+          {{- end }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -83,17 +129,17 @@ spec:
               podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: {{ .Chart.Name }}
-                    app.kubernetes.io/instance: {{ .Release.Name }}
+                    app.kubernetes.io/name: {{ $.Chart.Name }}
+                    app.kubernetes.io/instance: {{ $.Release.Name }}
                 topologyKey: kubernetes.io/hostname
 
   volumeClaimTemplates:
     - metadata:
-        name: {{ .Values.app.secretPrefix }}-volume
+        name: {{ $.Release.Name }}-volume
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: "{{ .Values.persistence.storageClass }}"
+        storageClassName: "{{ $.Values.persistence.storageClass }}"
         resources:
           requests:
-            storage: {{ .Values.persistence.size | quote }}
+            storage: {{ $.Values.persistence.size | quote }}
 {{- end }}
