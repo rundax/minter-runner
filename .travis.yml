@@ -54,7 +54,7 @@ install:
 
 script:
   - docker-compose -f docker-compose-ci.yml run app yarn
-  - docker-compose -f docker-compose-ci.yml run app yarn build-pord
+  - docker-compose -f docker-compose-ci.yml run app yarn build-prod
 
 
 deploy:
