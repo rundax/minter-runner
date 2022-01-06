@@ -28,18 +28,22 @@ spec:
         app.kubernetes.io/instance: {{ $.Release.Name }}
       annotations:
         checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
-        checksum/image-hash: {{ $.Values.image.hash | quote }}
+        checksum/image-digest: {{ $.Values.image.digest | quote }}
     spec:
+      terminationGracePeriodSeconds: 30
+
       {{- if $.Values.podSecurityContext.enabled }}
       securityContext: {{- omit $.Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
 
-      terminationGracePeriodSeconds: 30
-      imagePullSecrets:
-        - name: {{ $.Values.image.pullSecret }}
+      {{- if $.Values.image.pullSecrets }}
+      imagePullSecrets: {{ toYaml $.Values.image.pullSecrets | nindent 8 }}
+      {{- end }}
+
       initContainers:
         - name: dump-downloader
           image: "{{ $.Values.image.registry }}/{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command: ['node', 'dump_downloader.js']
 
           envFrom:
