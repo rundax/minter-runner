@@ -16,24 +16,24 @@ function app_deploy() {
 #    ${HELM} --namespace ${KUBE_NAMESPACE} uninstall ${HELM_APP_NAME}
 
     ${HELM} upgrade \
-       --debug \
-       --wait \
-       --namespace ${KUBE_NAMESPACE} \
-       --install ${HELM_APP_NAME} \
-       .helm/${HELM_CHART_NAME} \
-       \
-       --set image.registry=${DOCKER_SERVER_HOST} \
-       --set image.repository=${DOCKER_PROJECT_PATH}/app \
-       --set image.hash=$(docker images --no-trunc --quiet ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/app:${DOCKER_IMAGE_VERSION}) \
-       --set image.tag=${DOCKER_IMAGE_VERSION} \
-       --set image.pullSecret=docker-registry-${CI_PROJECT_NAME} \
-       \
-       --set app.externalSecrets[0]=${CI_PROJECT_NAME}-generic \
-       \
-       --set ingress.hostName=${KUBE_INGRESS_HOSTNAME} \
-       --set ingress.path=${KUBE_INGRESS_PATH} \
-       \
-       --set replicaCount=${KUBE_REPLICA_COUNT}
+      --debug \
+      --wait \
+      --namespace ${KUBE_NAMESPACE} \
+      --install ${HELM_APP_NAME} \
+      .helm/${HELM_CHART_NAME} \
+      \
+      --set image.registry=${DOCKER_SERVER_HOST} \
+      --set image.repository=${DOCKER_PROJECT_PATH}/app \
+      --set image.digest=$(docker images --no-trunc --quiet ${DOCKER_SERVER_HOST}/${DOCKER_PROJECT_PATH}/app:${DOCKER_IMAGE_VERSION}) \
+      --set image.tag=${DOCKER_IMAGE_VERSION} \
+      --set image.pullSecrets[0].name=docker-registry-${CI_PROJECT_NAME} \
+      \
+      --set app.externalSecrets[0]=${CI_PROJECT_NAME}-generic \
+      \
+      --set ingress.hostName=${KUBE_INGRESS_HOSTNAME} \
+      --set ingress.path=${KUBE_INGRESS_PATH} \
+      \
+      --set replicaCount=${KUBE_REPLICA_COUNT}
 }
 
 app_deploy \

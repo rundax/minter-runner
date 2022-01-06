@@ -4,9 +4,12 @@ image:
   registry: "null:5001"
   repository: null-value
   tag: null-value
-  pullSecret: null-value
-  hash: null-value
+  digest: null-value
   pullPolicy: Always
+  ## Optional array of imagePullSecrets containing private registry credentials
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  pullSecrets: [ ]
+  # - name: secretName
 
 metadata:
   deployedBy: null-value
@@ -42,7 +45,7 @@ ingress:
 persistence:
   enabled: true
   storageClass: "longhorn-local"
-  size: 300Gi
+  size: 150Gi
   annotations: {}
 
 
