@@ -31,7 +31,7 @@ if (envLoader === false) {
 const downloadUrl = env('APP_DUMP_URL', '');
 
 if (downloadUrl === '') {
-    logger.info('Env var APP_DUMP_URL is not set. skip backup downloader');
+    logger.info('Env var APP_DUMP_URL is not set. Skip backup downloader');
     process.exit(0);
 }
 
@@ -62,7 +62,7 @@ checkExistLockFile()
                 await downloadDump();
                 await unpackDump('blockchain/data/');
                 await unpackDump('blockchain/tmdata/');
-                fs.unlinkSync(dataDir + 'minter_backup.tar');
+                fs.unlinkSync('/tmp/minter_backup.tar');
                 fs.closeSync(fs.openSync(lockFile, 'w'));
             }  catch (err) {
                 logger.error(err);
@@ -84,10 +84,10 @@ async function downloadDump() {
             '--retry-wait=2',
             '--split=20',
             // '--dry-run',
-            // '--file-allocation=falloc',
+            '--file-allocation=none',
             '--continue=true',
-            '--dir=' + dataDir,
-            '--out=' + 'minter_backup.tar',
+            '--dir=/tmp',
+            '--out=minter_backup.tar',
             downloadUrl
         ]);
 
@@ -111,7 +111,7 @@ async function unpackDump(filePath: string) {
             '--extract',
             '--verbose',
             '--strip-components=1',
-            '--file=' + dataDir + 'minter_backup.tar',
+            '--file=/tmp/minter_backup.tar',
             '--directory',
             dataDir,
             filePath
